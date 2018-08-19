@@ -1,7 +1,6 @@
 package autofresh
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,24 +8,38 @@ import (
 	"net"
 	"os/exec"
 
+	"github.com/TerrenceHo/autofresh/config"
 	"github.com/TerrenceHo/autofresh/runner"
 	"github.com/TerrenceHo/autofresh/watchman"
 )
 
-var (
-	watchmanCommand  = "watchman"
-	directory        = "/Users/kho/go/src/github.com/TerrenceHo/ABFeature"
-	subscriptionName = "autofresh_watch"
-	buildCommand     = "go build /Users/kho/go/src/github.com/TerrenceHo/ABFeature/cmd/ABFeature/main.go"
-	runCommand       = "./main"
+const logo = `
+    ___         __        ______               __  
+   /   | __  __/ /_____  / ____/_______  _____/ /_ 
+  / /| |/ / / / __/ __ \/ /_  / ___/ _ \/ ___/ __ \
+ / ___ / /_/ / /_/ /_/ / __/ / /  /  __(__  ) / / /
+/_/  |_\__,_/\__/\____/_/   /_/   \___/____/_/ /_/ 
+`
 
-	startChannel chan bool
-	endChannel   chan bool
+const (
+	watchmanCommand  = "watchman"
+	directory        = "/Users/kho/go/src/github.com/TerrenceHo/autofresh/cmd"
+	subscriptionName = "test_autofresh"
+	buildCommand     = "go build /Users/kho/go/src/github.com/TerrenceHo/autofresh/cmd/main.go"
+	runCommand       = "./main"
 )
 
-func Start() {
+var (
+	startChannel chan bool
+	stopChannel  chan bool
+)
+
+func Start(conf config.Config) {
+	fmt.Println(logo)
 	startChannel = make(chan bool)
-	endChannel = make(chan bool)
+	stopChannel = make(chan bool)
+	isRunning := false
+
 	_, err := exec.LookPath(watchmanCommand)
 	if err != nil {
 		log.Fatalf("Failed to find watchman executable. Error: %s\n", err.Error())
@@ -49,64 +62,39 @@ func Start() {
 	log.Println("Spinning forever")
 	for {
 		start := <-startChannel
-		log.Println("Start", start)
-		buildErr, err := runner.Build(buildCommand)
-		if err != nil {
-			fmt.Println(buildErr)
-			fmt.Println(err.Error())
-			continue // skip run if build returned with error
+		if start {
+			buildErr, err := runner.Build(buildCommand)
+			if err != nil {
+				fmt.Println(buildErr)
+				fmt.Println(err.Error())
+				continue // skip run if build returned with error
+			}
+
+			// kill previous process if necessary
+			if isRunning {
+				stopChannel <- true
+			}
+
+			// run here
+			isRunning = runner.Run(runCommand, stopChannel)
 		}
-		// kill previous process if necessary
-		// run here
 	}
 }
 
 func read(c net.Conn, startChannel chan bool) {
 	d := json.NewDecoder(c)
 	m := make(map[string]interface{})
+	var start bool = true
 	for {
 		if err := d.Decode(&m); err != nil {
 			if err != io.EOF {
 				log.Fatalf("Error decoding, error: %s\n", err.Error())
 			}
-			continue
 		}
-		log.Println("Client got", m)
-		startChannel <- true
-	}
-}
-
-func run(runCommand string) {
-	cmd := exec.Command(runCommand)
-
-	stdoutIn, err := cmd.StdoutPipe()
-	if err != nil {
-		log.Fatalf("Error with StdoutPipe, error: %s\n", err.Error())
-	}
-
-	stderrIn, err := cmd.StderrPipe()
-	if err != nil {
-		log.Fatalf("Error with StderrPipe, error: %s\n", err.Error())
-	}
-
-	if err := cmd.Start(); err != nil {
-		log.Fatal("Failed to start command %s, error: %s\n", runCommand, err.Error())
-	}
-
-	var errStdout, errStderr error
-	var stdoutBuf, stderrBuf bytes.Buffer
-	stdout := io.MultiWriter(stdout, &stdoutBuf)
-	stderr := io.MultiReader(stderr, &stderrBuf)
-
-	go func() {
-		_, stdoutErr := io.Copy(stdout, stdoutIn)
-	}()
-	go func() {
-		_, stderrErr := io.Copy(stderr, stderrIn)
-	}()
-
-	if err := cmd.Wait(); err != nil {
-		log.Fatal("Running command failed, error %s\n", err.Error())
+		// fmt.Println(m)
+		fmt.Println("Start", start)
+		startChannel <- start
+		start = !start
 	}
 
 }
