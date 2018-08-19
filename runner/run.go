@@ -33,7 +33,7 @@ func Run(runCommand string, stopChannel chan bool) bool {
 	go func() { io.Copy(stderrLog, stderrIn) }()
 
 	if err := cmd.Start(); err != nil {
-		log.Fatal("Failed to start command %s, error: %s\n", runCommand, err.Error())
+		log.Fatalf("Failed to start command %s, error: %s\n", runCommand, err.Error())
 	}
 
 	log.Println("Running Command")
@@ -44,7 +44,7 @@ func Run(runCommand string, stopChannel chan bool) bool {
 			pid := cmd.Process.Pid
 			log.Printf("Killing PID %d\n", pid)
 			if err := cmd.Process.Kill(); err != nil {
-				log.Fatal("Killing process pidp %d failed, error: %s\n", err.Error())
+				log.Fatalf("Killing process pidp %d failed, error: %s\n", pid, err.Error())
 			}
 		}
 	}()

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"runtime"
 
 	"github.com/TerrenceHo/autofresh/config"
@@ -45,8 +46,13 @@ func main() {
 func serve(cmd *cobra.Command, args []string) {
 	conf := config.LoadConfig(cmd)
 
+	if conf.Version {
+		fmt.Printf("autofresh %s %s %s/%s\n", Version, GoVersion, GOOS, GOARCH)
+		fmt.Printf("git hash: %s\n", GitHash)
+		fmt.Printf("built at: %s\n", BuildTime)
+		os.Exit(0)
+	}
 	fmt.Println("Port", conf.Port)
 
-	// version check
 	// autoFresh.Start(conf)
 }
