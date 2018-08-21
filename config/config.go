@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
@@ -10,8 +9,11 @@ import (
 )
 
 type Config struct {
-	Version bool
-	Port    int
+	Version    bool
+	Hidebanner bool
+	Port       int
+	Watchman   string
+	WatchDir   string
 }
 
 func LoadConfig(cmd *cobra.Command) Config {
@@ -25,7 +27,7 @@ func LoadConfig(cmd *cobra.Command) Config {
 
 	viper.SetConfigFile("autofresh-config.json")
 	if err := viper.ReadInConfig(); err != nil {
-		fmt.Printf("Failed to read config file, error %s\n", err.Error())
+		log.Printf("Failed to read config file, error %s\n", err.Error())
 	}
 
 	var conf Config

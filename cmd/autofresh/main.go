@@ -34,7 +34,9 @@ func init() {
 	flags := mainCmd.Flags()
 
 	flags.BoolP("version", "v", false, "print version of autofresh")
-	flags.StringP("file", "f", "autofresh-config.json", "set path to configuration file.")
+	flags.BoolP("hidebanner", "h", false, "hide autofresh banner")
+	flags.StringP("watchman", "w", "watchman", "path to watchman executable")
+	flags.StringP("watchdir", "d", "./", "path to directory for autofresh to watch")
 	flags.StringP("port", "p", "31337", "set HTTP port of autofresh will run on, between 1024-65535.")
 
 }

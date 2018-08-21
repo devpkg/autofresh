@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net"
-	"os/exec"
 
 	"github.com/TerrenceHo/autofresh/config"
 	"github.com/TerrenceHo/autofresh/runner"
@@ -34,18 +33,21 @@ var (
 	stopChannel  chan bool
 )
 
+// Main application start point. Will check if watchman exists at that path,
+// retrieve the socket name, instantiate a connection to watchman using Unix
+// Sockets, subscribe to the directory, and begin reading the subscription
+// messages and building the executable.
 func Start(conf config.Config) {
-	fmt.Println(logo)
+	if !conf.Hidebanner {
+		fmt.Println(logo)
+	}
 	startChannel = make(chan bool)
 	stopChannel = make(chan bool)
 	isRunning := false
 
-	_, err := exec.LookPath(watchmanCommand)
-	if err != nil {
-		log.Fatalf("Failed to find watchman executable. Error: %s\n", err.Error())
-	}
+	watchman.Check(conf.Watchman)
 
-	sockname := watchman.GetSockName("watchman")
+	sockname := watchman.GetSockName(conf.Watchman)
 
 	conn, err := net.Dial("unix", sockname)
 	if err != nil {
@@ -54,25 +56,24 @@ func Start(conf config.Config) {
 	}
 	defer conn.Close()
 
+	go read(conn, startChannel) // read in separate go routine
+
 	// watchman.WatchProject(conn, directory)
 	watchman.Subscribe(conn, directory, subscriptionName)
 
-	go read(conn, startChannel) // read in separate go routine
-
-	log.Println("Spinning forever")
 	for {
 		start := <-startChannel
 		if start {
+			// kill previous process if necessary
+			if isRunning {
+				stopChannel <- true
+			}
+
 			buildErr, err := runner.Build(buildCommand)
 			if err != nil {
 				fmt.Println(buildErr)
 				fmt.Println(err.Error())
 				continue // skip run if build returned with error
-			}
-
-			// kill previous process if necessary
-			if isRunning {
-				stopChannel <- true
 			}
 
 			// run here
