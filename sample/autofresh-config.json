@@ -1,0 +1,5 @@
+{
+    "watchman": "/usr/local/bin/watchman",
+    "build": "go build -o sample .",
+    "run": "./sample"
+}

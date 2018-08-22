@@ -11,9 +11,9 @@ import (
 type Config struct {
 	Version    bool
 	Hidebanner bool
-	Port       int
 	Watchman   string
-	WatchDir   string
+	Build      string
+	Run        string
 }
 
 func LoadConfig(cmd *cobra.Command) Config {

@@ -36,13 +36,10 @@ func Run(runCommand string, stopChannel chan bool) bool {
 		log.Fatalf("Failed to start command %s, error: %s\n", runCommand, err.Error())
 	}
 
-	log.Println("Running Command")
 	go func() {
 		stop := <-stopChannel
-		log.Println("Stopping Command")
 		if stop {
 			pid := cmd.Process.Pid
-			log.Printf("Killing PID %d\n", pid)
 			if err := cmd.Process.Kill(); err != nil {
 				log.Fatalf("Killing process pidp %d failed, error: %s\n", pid, err.Error())
 			}

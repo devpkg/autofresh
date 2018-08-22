@@ -5,6 +5,7 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/TerrenceHo/autofresh"
 	"github.com/TerrenceHo/autofresh/config"
 	"github.com/spf13/cobra"
 )
@@ -24,10 +25,7 @@ var (
 var mainCmd = &cobra.Command{
 	Use:   "autofresh",
 	Short: "Autofresh: live reloading server",
-	// Run: func(cmd *cobra.Command, args []string) {
-	// serve()
-	// },
-	Run: serve,
+	Run:   serve,
 }
 
 func init() {
@@ -36,8 +34,8 @@ func init() {
 	flags.BoolP("version", "v", false, "print version of autofresh")
 	flags.Bool("hidebanner", false, "hide autofresh banner")
 	flags.StringP("watchman", "w", "watchman", "path to watchman executable")
-	flags.StringP("watchdir", "d", "./", "path to directory for autofresh to watch")
-	flags.StringP("port", "p", "31337", "set HTTP port of autofresh will run on, between 1024-65535.")
+	flags.StringP("build", "b", "", "set build command")
+	flags.StringP("run", "r", "", "set process start command/run built program")
 }
 
 func main() {
@@ -53,7 +51,6 @@ func serve(cmd *cobra.Command, args []string) {
 		fmt.Printf("built at: %s\n", BuildTime)
 		os.Exit(0)
 	}
-	fmt.Println("Port", conf.Port)
 
-	// autoFresh.Start(conf)
+	autofresh.Start(conf)
 }

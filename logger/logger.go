@@ -10,6 +10,6 @@ type LogWriter struct {
 }
 
 func (lw LogWriter) Write(p []byte) (n int, err error) {
-	fmt.Println(string(p))
+	fmt.Print(string(p))
 	return len(p), nil
 }

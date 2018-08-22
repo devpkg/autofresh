@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"path/filepath"
 
 	"github.com/TerrenceHo/autofresh/config"
 	"github.com/TerrenceHo/autofresh/runner"
@@ -21,16 +22,15 @@ const logo = `
 `
 
 const (
-	watchmanCommand  = "watchman"
-	directory        = "/Users/kho/go/src/github.com/TerrenceHo/autofresh/cmd"
 	subscriptionName = "test_autofresh"
-	buildCommand     = "go build /Users/kho/go/src/github.com/TerrenceHo/autofresh/cmd/main.go"
-	runCommand       = "./main"
 )
 
 var (
-	startChannel chan bool
-	stopChannel  chan bool
+	startChannel    chan bool
+	stopChannel     chan bool
+	watchmanCommand string
+	buildCommand    string
+	runCommand      string
 )
 
 // Main application start point. Will check if watchman exists at that path,
@@ -43,11 +43,18 @@ func Start(conf config.Config) {
 	}
 	startChannel = make(chan bool)
 	stopChannel = make(chan bool)
+	buildCommand = conf.Build
+	runCommand = conf.Run
+	watchmanCommand = conf.Watchman
 	isRunning := false
 
-	watchman.Check(conf.Watchman)
+	directory, err := filepath.Abs("./")
+	if err != nil {
+		log.Fatalf("Directory absolute file path cannot be found. Error: %s\n", err.Error())
+	}
+	watchman.Check(watchmanCommand)
 
-	sockname := watchman.GetSockName(conf.Watchman)
+	sockname := watchman.GetSockName(watchmanCommand)
 
 	conn, err := net.Dial("unix", sockname)
 	if err != nil {
@@ -92,10 +99,7 @@ func read(c net.Conn, startChannel chan bool) {
 				log.Fatalf("Error decoding, error: %s\n", err.Error())
 			}
 		}
-		// fmt.Println(m)
-		fmt.Println("Start", start)
 		startChannel <- start
 		start = !start
 	}
-
 }
