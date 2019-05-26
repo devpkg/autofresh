@@ -17,6 +17,7 @@ type Config struct {
 	Build      string
 	Run        string
 	Suffixes   []string
+	Port       int
 }
 
 // LoadConfig takes in a cobra Command and unmarshalls it into the custom config

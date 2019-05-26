@@ -3,7 +3,7 @@ package watcher
 import (
 	"fmt"
 
-	"github.com/TerrenceHo/autofresh/runner"
+	"github.com/devpkg/autofresh/runner"
 )
 
 // Watcher is an interface that defines how a file system watcher should

@@ -1,7 +1,7 @@
 # Autofresh
 
-[![Godoc](https://godoc.org/github.com/TerrenceHo/autofresh?status.svg)](http://godoc.org/github.com/TerrenceHo/autofresh)
-[![GoReportCard](https://goreportcard.com/badge/github.com/TerrenceHo/autofresh)](https://goreportcard.com/report/github.com/TerrenceHo/autofresh)
+[![Godoc](https://godoc.org/github.com/devpkg/autofresh?status.svg)](http://godoc.org/github.com/devpkg/autofresh)
+[![GoReportCard](https://goreportcard.com/badge/github.com/devpkg/autofresh)](https://goreportcard.com/report/github.com/devpkg/autofresh)
 
         ___         __        ______               __
        /   | __  __/ /_____  / ____/_______  _____/ /_
@@ -19,7 +19,7 @@ will automatically recompile, as seen above.
 
 ### Installation
 
-You can checkout the [releases](https://github.com/TerrenceHo/autofresh/releases) 
+You can checkout the [releases](https://github.com/devpkg/autofresh/releases) 
 page and download the latest version of autofresh.
 Install the binary compiled for your operating system and architecture. The same 
 binaries are also available under the directory `bin`. Remember to rename the
@@ -29,7 +29,7 @@ If you have a Go runtime installed, you can `go get` this repository and
 automatically install it. Make sure you put the GOBIN in your PATH.
 
 ```bash 
-go get github.com/TerrenceHo/autofresh 
+go get github.com/devpkg/autofresh 
 ```
 
 ### Dependencies

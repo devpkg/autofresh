@@ -5,7 +5,7 @@ import (
 	"log"
 	"os/exec"
 
-	"github.com/TerrenceHo/autofresh/logger"
+	"github.com/devpkg/autofresh/logger"
 )
 
 // Run a long process that needs to be manually killed. Killing a process is

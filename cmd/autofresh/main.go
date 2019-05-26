@@ -5,8 +5,8 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/TerrenceHo/autofresh"
-	"github.com/TerrenceHo/autofresh/config"
+	"github.com/devpkg/autofresh"
+	"github.com/devpkg/autofresh/config"
 	"github.com/spf13/cobra"
 )
 
@@ -37,6 +37,7 @@ func init() {
 	flags.StringP("build", "b", "", "set build command")
 	flags.StringP("run", "r", "", "set process start command/run built program")
 	flags.StringSliceP("suffixes", "s", []string{}, "array of file suffixes")
+	flags.IntP("port", "p", 0, "Serve directory files on localhost:<port>")
 }
 
 func main() {

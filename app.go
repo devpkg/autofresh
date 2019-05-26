@@ -5,9 +5,9 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/TerrenceHo/autofresh/config"
-	"github.com/TerrenceHo/autofresh/watcher"
-	"github.com/TerrenceHo/autofresh/watchman"
+	"github.com/devpkg/autofresh/config"
+	"github.com/devpkg/autofresh/watcher"
+	"github.com/devpkg/autofresh/watchman"
 )
 
 const logo = `
@@ -39,6 +39,7 @@ func Start(conf config.Config) {
 	if !conf.Hidebanner {
 		fmt.Println(logo)
 	}
+
 	startChannel = make(chan bool)
 	stopChannel = make(chan bool)
 	buildCommand = conf.Build
